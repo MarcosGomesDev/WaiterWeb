@@ -21,13 +21,15 @@ interface OrdersProps {
     title: string;
     orders: Order[];
     onCancelOrder: (orderId: string) => void;
+    onChangeOrderStatus: (orderId: string, status: Order['status']) => void;
 }
 
 const OrdersBoard: React.FC<OrdersProps> = ({
     icon,
     title,
     orders,
-    onCancelOrder
+    onCancelOrder,
+    onChangeOrderStatus
 }) => {
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -43,6 +45,21 @@ const OrdersBoard: React.FC<OrdersProps> = ({
         setModalVisible(!modalVisible);
         setSelectedOrder(null);
     };
+
+    const handleChangeOrderStatus = async () => {
+        setLoading(true);
+
+        const status = selectedOrder?.status === 'WAITING'
+            ? 'IN_PRODUCTION'
+            : 'DONE'
+
+        await api.patch(`/orders/${selectedOrder?._id}`, { status });
+
+        toast.success(`O pedido da mesa ${selectedOrder?.table} foi para produção!`)
+        setLoading(false);
+        setModalVisible(false);
+        onChangeOrderStatus(selectedOrder!._id, status)
+    }
 
     const handleCancelOrder = async () => {
         setLoading(true);
@@ -61,6 +78,7 @@ const OrdersBoard: React.FC<OrdersProps> = ({
                 order={selectedOrder}
                 onClose={handleCloseModal}
                 onCancelOrder={handleCancelOrder}
+                onChangeOrderStatus={handleChangeOrderStatus}
                 loading={loading}
             />
             <Header>

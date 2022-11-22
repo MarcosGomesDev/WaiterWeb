@@ -40,12 +40,20 @@ interface OrderModalProps {
     onClose: () => void;
     onCancelOrder: () => Promise<void>;
     loading: boolean;
+    onChangeOrderStatus: () => void;
 }
 
-const OrderModal: React.FC<OrderModalProps> = ({ visible, order, onClose, onCancelOrder, loading }) => {
+const OrderModal: React.FC<OrderModalProps> = ({
+    visible,
+    order,
+    onClose,
+    onCancelOrder,
+    loading,
+    onChangeOrderStatus
+}) => {
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if(event.key === 'Escape') {
+            if (event.key === 'Escape') {
                 onClose();
             }
         };
@@ -61,7 +69,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ visible, order, onClose, onCanc
         return null;
     }
 
-    const total = order.products.reduce((total, {product, quantity}) => {
+    const total = order.products.reduce((total, { product, quantity }) => {
         return total + (product.price * quantity);
     }, 0);
 
@@ -119,12 +127,21 @@ const OrderModal: React.FC<OrderModalProps> = ({ visible, order, onClose, onCanc
                 </OrderDetails>
 
                 <Footer>
-                    <PrimaryButton
-                        disabled={loading}
-                    >
-                        <Icon>👩🏼‍🍳</Icon>
-                        <TitleBtn>Iniciar produção</TitleBtn>
-                    </PrimaryButton>
+                    {order.status !== 'DONE' && (
+                        <PrimaryButton
+                            disabled={loading}
+                            onClick={onChangeOrderStatus}
+                        >
+                            <Icon>
+                                {order.status === 'WAITING' && '👩🏼‍🍳'}
+                                {order.status === 'IN_PRODUCTION' && '✅'}
+                            </Icon>
+                            <TitleBtn>
+                                {order.status === 'WAITING' && 'Iniciar Produção'}
+                                {order.status === 'IN_PRODUCTION' && 'Concluir Pedido'}
+                            </TitleBtn>
+                        </PrimaryButton>
+                    )}
                     <SecondaryButton
                         onClick={onCancelOrder}
                         disabled={loading}

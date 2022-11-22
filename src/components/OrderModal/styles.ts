@@ -155,7 +155,9 @@ export const PrimaryButton = styled.button`
     }
 `;
 
-export const TitleBtn = styled.span``;
+export const TitleBtn = styled.span`
+    margin-left: 12px;
+`;
 
 export const SecondaryButton = styled.button`
     background: transparent;
